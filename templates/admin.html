@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="fw-bold">Admin Panel</h1>
+      <p class="text-muted">
+        Upload projects, testimonials, and manage offers.
+      </p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- UPLOAD FORMS -->
+    <div class="col-lg-6">
+      <!-- PROJECT FORM -->
+      <div class="card shadow-sm p-4 mb-4">
+        <h4 class="mb-3">Upload Project</h4>
+        <form method="post" enctype="multipart/form-data">
+          {{ pform.hidden_tag() }}
+          <input type="hidden" name="form_name" value="project">
+          <div class="mb-3">
+            {{ pform.title.label(class="form-label") }}
+            {{ pform.title(class="form-control", placeholder="Project title") }}
+          </div>
+          <div class="mb-3">
+            {{ pform.description.label(class="form-label") }}
+            {{ pform.description(class="form-control", rows="4", placeholder="Short project description") }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Project image</label>
+            <input type="file" name="image" accept="image/*" class="form-control" id="projectImageInput">
+            <div class="mt-2">
+              <img id="projectImagePreview" src="#" alt="" style="max-width:220px;display:none;border-radius:8px;"/>
+            </div>
+          </div>
+          {{ pform.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+
+      <!-- TESTIMONIAL FORM -->
+      <div class="card shadow-sm p-4 mb-4">
+        <h4 class="mb-3">Upload Testimonial</h4>
+        <form method="post" enctype="multipart/form-data">
+          {{ tform.hidden_tag() }}
+          <input type="hidden" name="form_name" value="testimonial">
+          <div class="mb-3">
+            {{ tform.customer_name.label(class="form-label") }}
+            {{ tform.customer_name(class="form-control", placeholder="Customer name") }}
+          </div>
+          <div class="mb-3">
+            {{ tform.content.label(class="form-label") }}
+            {{ tform.content(class="form-control", rows="4", placeholder="What the customer said") }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Customer photo</label>
+            <input type="file" name="photo" accept="image/*" class="form-control" id="testiPhotoInput">
+            <div class="mt-2">
+              <img id="testiPhotoPreview" src="#" alt="" style="max-width:120px;display:none;border-radius:50%;"/>
+            </div>
+          </div>
+          {{ tform.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+
+      <!-- OFFER FORM -->
+      <div class="card shadow-sm p-4 mb-4">
+        <h4 class="mb-3">Create Offer</h4>
+        <form method="post">
+          {{ oform.hidden_tag() }}
+          <input type="hidden" name="form_name" value="offer">
+          <div class="mb-3">
+            {{ oform.title.label(class="form-label") }}
+            {{ oform.title(class="form-control", placeholder="Offer title (e.g., 10% off Building X)") }}
+          </div>
+          <div class="mb-3">
+            {{ oform.details.label(class="form-label") }}
+            {{ oform.details(class="form-control", rows="4", placeholder="Offer details, terms and dates") }}
+          </div>
+          {{ oform.submit(class="btn btn-success") }}
+        </form>
+      </div>
+    </div>
+
+    <!-- CURRENT ITEMS (unchanged listing with delete buttons) -->
+    <div class="col-lg-6">
+      <!-- PROJECTS -->
+      <div class="card shadow-sm p-4 mb-4">
+        <h4 class="mb-3">Current Projects</h4>
+        {% if projects %}
+          <div class="list-group">
+            {% for p in projects %}
+              <div class="list-group-item d-flex gap-3 align-items-center">
+                {% if p.image_filename %}
+                  <img src="{{ url_for('uploaded_file', filename=p.image_filename) }}"
+                       alt="{{ p.title }}"
+                       style="width:90px;height:60px;object-fit:cover;border-radius:8px;">
+                {% else %}
+                  <div style="width:90px;height:60px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;color:#888">No image</div>
+                {% endif %}
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <strong>{{ p.title }}</strong><br>
+                      <small class="text-muted">{{ p.created_at.strftime('%b %d, %Y') }}</small>
+                    </div>
+                    <div class="d-flex flex-column align-items-end gap-1">
+                      <small class="text-muted">#{{ p.id }}</small>
+                      <form method="post"
+                            action="{{ url_for('delete_project', project_id=p.id) }}"
+                            onsubmit="return confirm('Delete this project?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="mt-1 small text-truncate">{{ p.description }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No projects uploaded yet.</p>
+        {% endif %}
+      </div>
+
+      <!-- TESTIMONIALS -->
+      <div class="card shadow-sm p-4 mb-4">
+        <h4 class="mb-3">Testimonials</h4>
+        {% if testimonials %}
+          <div class="list-group">
+            {% for t in testimonials %}
+              <div class="list-group-item d-flex gap-3 align-items-center">
+                {% if t.photo_filename %}
+                  <img src="{{ url_for('uploaded_file', filename=t.photo_filename) }}"
+                       alt="{{ t.customer_name }}"
+                       style="width:60px;height:60px;object-fit:cover;border-radius:50%;">
+                {% else %}
+                  <div style="width:60px;height:60px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;color:#888">N/A</div>
+                {% endif %}
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <strong>{{ t.customer_name }}</strong><br>
+                      <small class="text-muted">{{ t.created_at.strftime('%b %d, %Y') }}</small>
+                      <div class="mt-1 small text-truncate">{{ t.content }}</div>
+                    </div>
+                    <form method="post"
+                          action="{{ url_for('delete_testimonial', testimonial_id=t.id) }}"
+                          onsubmit="return confirm('Delete this testimonial?');">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No testimonials yet.</p>
+        {% endif %}
+      </div>
+            <!-- CONSULTATIONS -->
+      <div class="card shadow-sm p-4 mt-4">
+        <h4 class="mb-3">Consultation Requests</h4>
+        {% if consultations %}
+          <div class="list-group">
+            {% for c in consultations %}
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <strong>{{ c.name }}</strong>
+                    <div class="small text-muted">
+                      {{ c.email }}{% if c.phone %} · {{ c.phone }}{% endif %}
+                    </div>
+                  </div>
+                  <small class="text-muted">
+                    {{ c.created_at.strftime('%b %d, %Y %H:%M') }}
+                  </small>
+                </div>
+                {% if c.message %}
+                  <div class="mt-2 small">
+                    {{ c.message }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No consultation requests yet.</p>
+        {% endif %}
+      </div>
+
+
+      <!-- OFFERS -->
+      <div class="card shadow-sm p-4">
+        <h4 class="mb-3">Active Offers</h4>
+        {% if offers %}
+          <ul class="list-group">
+            {% for o in offers %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <strong>{{ o.title }}</strong>
+                  <div class="small text-muted">{{ o.details }}</div>
+                </div>
+                <div class="text-end small">
+                  {% if o.active %}
+                    <span class="badge bg-success mb-2">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary mb-2">Inactive</span>
+                  {% endif %}
+                  <form method="post"
+                        action="{{ url_for('delete_offer', offer_id=o.id) }}"
+                        onsubmit="return confirm('Delete this offer?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0">No offers found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // preview project image
+  const projectInput = document.getElementById('projectImageInput');
+  const projectPreview = document.getElementById('projectImagePreview');
+  if (projectInput) {
+    projectInput.addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) { projectPreview.style.display='none'; return; }
+      projectPreview.src = URL.createObjectURL(f);
+      projectPreview.style.display = 'block';
+    });
+  }
+
+  // preview testimonial photo
+  const testiInput = document.getElementById('testiPhotoInput');
+  const testiPreview = document.getElementById('testiPhotoPreview');
+  if (testiInput) {
+    testiInput.addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) { testiPreview.style.display='none'; return; }
+      testiPreview.src = URL.createObjectURL(f);
+      testiPreview.style.display = 'block';
+    });
+  }
+
+  // small UX: focus first form field on load
+  (function(){
+    const f = document.querySelector('input[name="{{ pform.title.name }}"]');
+    if (f) f.focus();
+  })();
+</script>
+{% endblock %}

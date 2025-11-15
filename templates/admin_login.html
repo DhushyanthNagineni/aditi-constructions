@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="py-5" style="min-height:80vh; display:flex; align-items:center; background:var(--muted);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5" data-aos="fade-up">
+        <div class="card shadow-sm border-0 p-4 rounded-3">
+          <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Aditi Construction Logo" width="90" height="90" class="mb-2">
+            <h3 class="fw-bold text-primary">Admin Login</h3>
+            <p class="text-muted small">Enter your credentials to access the admin dashboard.</p>
+          </div>
+
+          <!-- Flash messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, msg in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                  {{ msg }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <form method="post" action="{{ url_for('admin_login', next=request.args.get('next')) }}">
+            <div class="mb-3">
+              <label for="username" class="form-label fw-semibold">Username</label>
+              <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Enter username" required autofocus>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label fw-semibold">Password</label>
+              <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Enter password" required>
+            </div>
+            <div class="d-grid mt-4">
+              <button class="btn btn-primary btn-lg" type="submit">Login</button>
+            </div>
+          </form>
+
+          <div class="text-center mt-4 small text-muted">
+            <p>Forgot your credentials? Contact the site admin.</p>
+            <a href="{{ url_for('index') }}" class="text-decoration-none"><i class="fa fa-arrow-left me-1"></i> Back to Website</a>
+          </div>
+        </div>
+
+        <div class="text-center text-muted mt-3 small">
+          <p>Tip: Default login is <code>admin / admin</code> if not configured.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

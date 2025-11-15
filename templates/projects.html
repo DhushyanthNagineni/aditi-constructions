@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background: var(--muted); min-height: 70vh;">
+  <div class="container">
+    <!-- Page header -->
+    <div class="row mb-4">
+      <div class="col-12 col-lg-8" data-aos="fade-up">
+        <h1 class="fw-bold mb-2">Our Projects</h1>
+        <p class="text-muted mb-0">
+          Explore our latest residential, commercial, and renovation works delivered with quality and precision.
+        </p>
+      </div>
+    </div>
+
+    <!-- Projects grid -->
+    <div class="row g-4" data-aos="fade-up" data-aos-delay="80">
+      {% if projects %}
+        {% for p in projects %}
+          <div class="col-md-6 col-lg-4">
+            <div class="project-item">
+              {% if p.image_filename %}
+                <img src="{{ url_for('uploaded_file', filename=p.image_filename) }}"
+                     alt="{{ p.title }}">
+              {% endif %}
+              <div class="project-overlay d-flex flex-column justify-content-end">
+                <div>
+                  <h5 class="fw-semibold mb-1">{{ p.title }}</h5>
+                  {% if p.description %}
+                    <p class="small mb-1 text-truncate-2">{{ p.description }}</p>
+                  {% endif %}
+                  <small class="text-light-50">
+                    Added on {{ p.created_at.strftime('%b %d, %Y') }}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12">
+          <div class="alert alert-info mb-0">
+            No projects have been added yet. Please check back soon.
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Back link -->
+    <div class="mt-4">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+        ← Back to Home
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

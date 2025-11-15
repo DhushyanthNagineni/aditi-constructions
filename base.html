@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or 'Aditi Construction — Building the Future' }}</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- AOS Animations -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
+
+    <style>
+  /* ---------- Theme variables ---------- */
+  :root {
+    --primary: #002B5B;   /* deep navy */
+    --accent: #FFD700;    /* gold */
+    --muted: #f6f8fb;     /* page bg */
+    --surface: #ffffff;
+    --nav-height: 72px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* ---------- Base ---------- */
+  html, body { height: 100%; margin: 0; font-family: var(--font, 'Montserrat', sans-serif); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  body { color: #222; background: var(--muted); }
+
+  /* ---------- NAVBAR ---------- */
+  .navbar-custom {
+    transition: background-color .35s, box-shadow .35s, padding .25s;
+    padding: .5rem 1rem;
+    height: var(--nav-height);
+  }
+  .navbar-custom.scrolled { background: rgba(0,43,91,0.97); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+  .navbar-brand { font-weight: 800; color: var(--accent) !important; }
+  .nav-link { color: #fff !important; }
+  .nav-link:hover { color: var(--accent) !important; }
+
+  /* ---------- HERO (pseudo element background) ---------- */
+  .hero {
+    min-height: calc(80vh - var(--nav-height));
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: #0a0505;
+    overflow: hidden;
+  }
+  
+
+  /* Background image via ::before so content is unaffected */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: url('https://images.unsplash.com/photo-1526406915891-95a9a0b0d1f0?auto=format&fit=crop&w=1600&q=60');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(.48) contrast(.96);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.45));
+  }
+
+  /* On small screens, avoid background-attachment: fixed for performance */
+  @media (max-width: 767px) {
+    .hero::before { background-attachment: scroll; filter: brightness(.6); }
+    .hero { min-height: calc(60vh - var(--nav-height)); }
+  }
+
+  /* Ensure hero content is above background */
+  .hero-inner {
+    position: relative;
+    z-index: 50;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .headline { font-size: 1.9rem; font-weight: 700; letter-spacing: .2px; margin: 0 0 .6rem; }
+  @media(min-width:768px){ .headline { font-size: 2.6rem; } }
+  .lead { color: rgba(255,255,255,0.92); }
+
+  /* ---------- BUTTONS: visible + accessible ---------- */
+  /* Primary hero CTA (new style) */
+  .btn-hero {
+    display: inline-block;
+    background: var(--accent) !important;
+    color: var(--primary) !important;
+    font-weight: 800;
+    border-radius: 999px;
+    padding: .72rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(11,19,32,0.12);
+    border: 0;
+    text-decoration: none;
+  }
+
+  /* Outline hero CTA (new style) */
+  .btn-outline-hero {
+    display: inline-block;
+    background: transparent !important;
+    color: #fff !important;
+    border: 2px solid rgba(255,255,255,0.95) !important;
+    padding: .58rem 1rem;
+    font-weight: 700;
+    border-radius: 999px;
+  }
+
+  /* Compatibility: old classes (so older templates continue to work) */
+  .btn-cta {
+    background: var(--accent);
+    color: var(--primary);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 12px 26px;
+    display: inline-block;
+    border: 0;
+  }
+  .btn-outline-light {
+    border: 2px solid rgba(255,255,255,0.7);
+    padding: 12px 24px;
+    color: #fff !important;
+    font-weight: 700;
+    border-radius: 999px;
+    background: transparent !important;
+  }
+
+  /* Make sure links in hero are above overlays */
+  .hero a { position: relative; z-index: 60; }
+
+  /* ---------- CARDS & PROJECT ITEMS ---------- */
+  .project-item { position: relative; overflow: hidden; border-radius: 10px; background: #fff; box-shadow: 0 8px 30px rgba(11,19,32,0.06); }
+  .project-item img { width: 100%; height: 220px; object-fit: cover; transition: transform .6s ease; display: block; }
+  .project-item:hover img { transform: scale(1.06); }
+  .project-overlay { position: absolute; inset: 0; display:flex; align-items:flex-end; padding:16px; color:#fff; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.45)); }
+
+  /* ---------- TESTIMONIALS ---------- */
+  .testimonials { background-size: cover; background-position: center; color: #fff; }
+  .testimonials .overlay { background: rgba(0,0,0,0.46); }
+
+  /* ---------- FOOTER ---------- */
+  footer { background: #06162a; color: #cfe6ff; padding: 24px 0; }
+  footer a { color: #fff; text-decoration: none; }
+
+  /* ---------- Modal ---------- */
+  .modal-content { border-radius: 10px; }
+
+  /* ---------- Utilities & responsiveness ---------- */
+  .text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  :focus { outline: 3px solid rgba(255,215,0,0.15); outline-offset: 2px; }
+
+  @media (max-width: 575px) {
+    .headline { font-size: 1.35rem; }
+    .lead { font-size: .95rem; }
+    .btn-hero, .btn-outline-hero { display: block; width: 100%; text-align: center; }
+  }
+</style>
+
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body data-bs-spy="scroll" data-bs-target="#nav" data-bs-offset="120" tabindex="0">
+
+  <!-- NAVBAR -->
+  <nav id="nav" class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+        <!-- <img src="{{ url_for('static', filename='logo.png') }}" alt="Aditi Constructions Logo" width="80" height="80" class="me-2"> --> 
+        <span class="fw-bold">Aditi Constructions</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item ms-3">
+            <a class="btn btn-sm btn-light" href="#contact">Request a Consultation</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+ <main class="mt-5 pt-4">
+  {% set flashed = get_flashed_messages(with_categories=true) %}
+  {% if flashed %}
+    <div class="container mt-4">
+      {% for category, message in flashed %}
+        {# If category is falsy or 'message', map to 'info' #}
+        {% set alert_class = 'info' %}
+        {% if category %}
+          {% if category in ['error','danger'] %}
+            {% set alert_class = 'danger' %}
+          {% elif category in ['success','ok'] %}
+            {% set alert_class = 'success' %}
+          {% elif category in ['warning','warn'] %}
+            {% set alert_class = 'warning' %}
+          {% elif category in ['info','message'] %}
+            {% set alert_class = 'info' %}
+          {% else %}
+            {% set alert_class = category %}
+          {% endif %}
+        {% endif %}
+        <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+
+  <!-- OFFERS MODAL -->
+  <div class="modal fade" id="offersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-primary">🏢 Current Offers</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="offersBody">
+          <!-- Offers loaded dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-4">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div>&copy; 2025 Aditi Constructions. All rights reserved.</div>
+      <div class="d-flex gap-3 align-items-center">
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook fa-lg"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram fa-lg"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 700, once: true });
+
+    // Navbar color change on scroll
+    const navbar = document.querySelector('.navbar-custom');
+    function onScroll() {
+      if (window.scrollY > 40)
+        navbar.classList.add('scrolled');
+      else
+        navbar.classList.remove('scrolled');
+    }
+    window.addEventListener('scroll', onScroll);
+
+    // Update year if not using Flask's now()
+    if (!document.querySelector('#year') && document.querySelector('footer span'))
+      document.querySelector('footer span').textContent = new Date().getFullYear();
+  </script>
+  <script>
+(async function showOffersOnce(){
+  const seenKey = 'seen_offers_v2';
+  try {
+    // If you want to force re-testing, run in console: localStorage.removeItem('seen_offers_v2')
+    if (localStorage.getItem(seenKey)) {
+      console.debug('offers: already seen (localStorage). Remove key to test again.');
+      return;
+    }
+
+    // Fetch the API (absolute path). Use cache: 'no-store' to avoid stale responses.
+    const resp = await fetch('/api/active-offers', { cache: 'no-store' });
+    console.debug('offers: fetch status', resp.status, resp.statusText);
+    if (!resp.ok) {
+      console.warn('offers: API returned non-OK status', resp.status);
+      return;
+    }
+
+    const data = await resp.json();
+    console.debug('offers: data', data);
+
+    if (!Array.isArray(data) || data.length === 0) {
+      console.debug('offers: no active offers returned');
+      return;
+    }
+
+    const body = document.getElementById('offersBody');
+    const modalEl = document.getElementById('offersModal');
+
+    if (!body) {
+      console.warn('offers: #offersBody not found in DOM — check base.html contains modal markup');
+      return;
+    }
+    if (!modalEl) {
+      console.warn('offers: #offersModal not found in DOM — check base.html contains modal markup');
+      return;
+    }
+
+    // build DOM nodes safely (avoid innerHTML with untrusted content)
+    body.innerHTML = ''; // clear
+    data.forEach(o => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mb-3';
+
+      const title = document.createElement('h5');
+      title.className = 'mb-1';
+      title.textContent = o.title || 'Offer';
+
+      const desc = document.createElement('p');
+      desc.className = 'mb-1';
+      desc.textContent = o.details || '';
+
+      wrapper.appendChild(title);
+      wrapper.appendChild(desc);
+
+      if (o.starts_at || o.ends_at) {
+        const small = document.createElement('small');
+        small.className = 'text-muted d-block mb-2';
+        const parts = [];
+        if (o.starts_at) parts.push('Starts: ' + new Date(o.starts_at).toLocaleString());
+        if (o.ends_at) parts.push('Ends: ' + new Date(o.ends_at).toLocaleString());
+        small.textContent = parts.join(' • ');
+        wrapper.appendChild(small);
+      }
+
+      const hr = document.createElement('hr');
+      wrapper.appendChild(hr);
+
+      body.appendChild(wrapper);
+    });
+
+    // show modal
+    const modal = new bootstrap.Modal(modalEl, { keyboard: true, backdrop: 'true' });
+    modal.show();
+
+    // mark as seen
+    localStorage.setItem(seenKey, '1');
+    console.debug('offers: modal shown and marked seen');
+  } catch (err) {
+    console.error('offers: unexpected error', err);
+  }
+})();
+</script>
+
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
